@@ -1,0 +1,173 @@
+import json
+from pathlib import Path
+
+notebook = {
+    "nbformat": 4,
+    "nbformat_minor": 0,
+    "metadata": {
+        "colab": {
+            "provenance": [],
+            "authorship_tag": "Udipto Mondal"
+        },
+        "kernelspec": {
+            "name": "python3",
+            "display_name": "Python 3"
+        },
+        "language_info": {
+            "name": "python"
+        }
+    },
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "# Multi-Tool AI Agent for Bangladesh\n",
+                "\n",
+                "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Udipto-Mondal/Project-Multi-Tool-AI-Agent-for-Bangladesh/blob/main/notebooks/Bangladesh_MultiTool_AI_Agent_Demo.ipynb)\n",
+                "\n",
+                "This notebook provides a complete interactive demonstration of the **Multi-Tool AI Agent for Bangladesh**.\n",
+                "\n",
+                "### Features Covered:\n",
+                "1. **InstitutionsDBTool**: Answers institutional & educational queries across 34,900+ institutions.\n",
+                "2. **HospitalsDBTool**: Answers healthcare and clinical queries across 38,800+ hospital facilities.\n",
+                "3. **RestaurantsDBTool**: Answers dining, cuisine, and rating queries across 10,700+ restaurants.\n",
+                "4. **WebSearchTool**: Answers general knowledge, government policies, and real-time contextual queries.\n",
+                "5. **Main Agent Routing**: Automatically routes data questions to databases and broad questions to web search."
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 1. Setup & Installation"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "execution_count": None,
+            "outputs": [],
+            "source": [
+                "# Clone repository if running directly in Google Colab\n",
+                "import os\n",
+                "if not os.path.exists('Project-Multi-Tool-AI-Agent-for-Bangladesh'):\n",
+                "    !git clone https://github.com/Udipto-Mondal/Project-Multi-Tool-AI-Agent-for-Bangladesh.git\n",
+                "    %cd Project-Multi-Tool-AI-Agent-for-Bangladesh\n",
+                "else:\n",
+                "    %cd Project-Multi-Tool-AI-Agent-for-Bangladesh\n",
+                "\n",
+                "!pip install -q -r requirements.txt"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 2. Verify / Build Databases"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "execution_count": None,
+            "outputs": [],
+            "source": [
+                "# Pre-built databases are included in data/, but can be rebuilt deterministically:\n",
+                "!python scripts/build_databases.py"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 3. Run Automated Pytest Suite"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "execution_count": None,
+            "outputs": [],
+            "source": [
+                "!python -m pytest tests/ -v"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 4. Query Individual DB Tools Programmatically"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "execution_count": None,
+            "outputs": [],
+            "source": [
+                "from src.tools import InstitutionsDBTool, HospitalsDBTool, RestaurantsDBTool, WebSearchTool\n",
+                "\n",
+                "inst_tool = InstitutionsDBTool()\n",
+                "hosp_tool = HospitalsDBTool()\n",
+                "rest_tool = RestaurantsDBTool()\n",
+                "search_tool = WebSearchTool()\n",
+                "\n",
+                "print(\"=== Institutions Query ===\")\n",
+                "print(inst_tool.run(\"How many colleges are in Dhaka?\"))\n",
+                "\n",
+                "print(\"\\n=== Hospitals Query ===\")\n",
+                "print(hosp_tool.run(\"Find DGHS facilities in Sylhet\"))\n",
+                "\n",
+                "print(\"\\n=== Restaurants Query ===\")\n",
+                "print(rest_tool.run(\"Top rated restaurants in Dhaka\"))\n",
+                "\n",
+                "print(\"\\n=== Web Search Query ===\")\n",
+                "print(search_tool.run(\"What is the healthcare policy in Bangladesh?\"))"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 5. Main Agent Unified Routing Demo"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "execution_count": None,
+            "outputs": [],
+            "source": [
+                "from src.agent import BangladeshAIAgent\n",
+                "\n",
+                "# Initialize the main agent (optionally pass GOOGLE_API_KEY in environment or constructor)\n",
+                "agent = BangladeshAIAgent(verbose=True)\n",
+                "\n",
+                "test_questions = [\n",
+                "    \"How many hospitals are in Dhaka?\",\n",
+                "    \"What is the role of DGHS in Bangladesh?\",\n",
+                "    \"How many colleges are in Dhaka?\",\n",
+                "    \"Top rated restaurants in Dhaka\",\n",
+                "    \"What is the healthcare policy in Bangladesh?\"\n",
+                "]\n",
+                "\n",
+                "for q in test_questions:\n",
+                "    print(\"=\" * 60)\n",
+                "    print(f\"QUESTION: {q}\")\n",
+                "    print(f\"TARGET TOOL: {agent.route_query_offline(q)}\")\n",
+                "    answer = agent.run(q)\n",
+                "    print(\"\\nANSWER:\")\n",
+                "    print(answer)\n",
+                "    print(\"=\" * 60)"
+            ]
+        }
+    ]
+}
+
+dest_dir = Path("notebooks")
+dest_dir.mkdir(parents=True, exist_ok=True)
+with open(dest_dir / "Bangladesh_MultiTool_AI_Agent_Demo.ipynb", "w", encoding="utf-8") as f:
+    json.dump(notebook, f, indent=2)
+
+print("Notebook generated successfully.")
