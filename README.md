@@ -103,10 +103,15 @@ python scripts/download_data.py
 python scripts/build_databases.py
 ```
 
-### 4. Running DB Tools Programmatically
-Each DB tool conforms to LangChain's `BaseTool` interface and can be run standalone:
+### 4. Running Tools Programmatically
+Each tool conforms to LangChain's `BaseTool` interface and can be run standalone:
 ```python
-from src.tools import InstitutionsDBTool, HospitalsDBTool, RestaurantsDBTool
+from src.tools import (
+    InstitutionsDBTool,
+    HospitalsDBTool,
+    RestaurantsDBTool,
+    WebSearchTool
+)
 
 # Institutions query
 inst_tool = InstitutionsDBTool()
@@ -119,6 +124,10 @@ print(hosp_tool.run("Find DGHS facilities in Sylhet"))
 # Restaurants query
 rest_tool = RestaurantsDBTool()
 print(rest_tool.run("Top rated restaurants in Dhaka"))
+
+# General knowledge web search
+search_tool = WebSearchTool()
+print(search_tool.run("What is the healthcare policy in Bangladesh?"))
 ```
 
 ### 5. Run Automated Tests
@@ -132,5 +141,5 @@ python -m pytest tests/ -v
 
 - [x] **Part 1:** Convert CSV datasets to normalized, indexed SQLite databases.
 - [x] **Part 2:** Implement domain-specific LangChain database query tools (`InstitutionsDBTool`, `HospitalsDBTool`, `RestaurantsDBTool`).
-- [ ] **Part 3:** Implement web search integration (`WebSearchTool`) for contextual and real-time queries.
+- [x] **Part 3:** Implement web search integration (`WebSearchTool`) for contextual and real-time queries.
 - [ ] **Part 4:** Build the unified LangChain Agent Executor with routing logic, interactive CLI, and demo tests.
